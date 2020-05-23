@@ -74,7 +74,7 @@ function travis_before_install
         sudo chmod 666 /dev/kvm
     fi
     if [ "$TRAVIS" = true ]; then
-        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' > /etc/udev/rules.d/99-kvm4all.rules
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules > /dev/null
         sudo udevadm control --reload-rules
         sudo udevadm trigger
     fi
