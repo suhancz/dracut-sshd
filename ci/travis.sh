@@ -67,10 +67,16 @@ function travis_before_install
     kvm-ok || true
     grep 'vmx\|svm' /proc/cpuinfo || true
     ls -l /dev/kvm || true
+    grep -r kvm /lib/udev/rules.d
     echo "Verifying that (nested) virtualization is available ... done"
 
     if [ -e /dev/kvm ]; then
         sudo chmod 666 /dev/kvm
+    fi
+    if [ "$TRAVIS" = true ]; then
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' > /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger
     fi
 }
 
