@@ -31,7 +31,7 @@ unlocking is then as simple as:
 That means under normal circumstances the completion of all
 password prompts automatically resumes the boot process.
 
-The command `systemd-tty-ask-password-agent --list` prints an overview
+The command [`systemd-tty-ask-password-agent --list`][pwagent] prints an overview
 over all pending password prompts.
 
 ## Example: Emergency Shell
@@ -72,7 +72,10 @@ Copy the `46sshd` subdirectory to the [Dracut][dracut] module directory:
 Alternatively, you can install the latest stable version from the
 [dracut-sshd copr repository][copr].
 
-With a sshd that lacks systemd support (e.g. under Gentoo), one
+Either way, once present under `/usr/lib/dracut/modules.d` it's
+enabled, by default.
+
+With an sshd that lacks systemd support (e.g. under Gentoo), one
 has to adjust the systemd service file:
 
     # echo 'Skip this sed on Fedora/RHEL/CentOS/Debian/Ubuntu/...!'
@@ -80,16 +83,6 @@ has to adjust the systemd service file:
           -e 's@^\(ExecStart=/usr/sbin/sshd\) -D@\1 -e -D@' \
           -i \
           /usr/lib/dracut/modules.d/46sshd/sshd.service
-
-It's enabled, by default - unless the Dracut network module is missing. Thus:
-
-    # dnf install -y dracut-network
-
-(this package also contains the [`systemd-networkd`][networkd]
-Dracut module)
-
-When installing from copr, `dracut-network` is automatically
-installed as dependency.
 
 Make sure that `/root/.ssh/authorized_keys` contains the right
 keys, as it's included in the [initramfs][iramfs]:
@@ -99,27 +92,44 @@ keys, as it's included in the [initramfs][iramfs]:
 That said, if `/root/.ssh/dracut_authorized_keys` is present
 then it is included, instead.
 
+Of course, our initramfs image needs network support. The simplest
+way to achieve this is to include [networkd][networkd]. To install
+the networkd dracut module:
+
+    # dnf install -y dracut-network
+
+When installing from copr, `dracut-network` is automatically
+installed as dependency.
+
 Create a non-[NetworkManager][nm] network config, e.g. via
 [Networkd][networkd]:
 
     $ cat /etc/systemd/network/20-wired.network 
     [Match]
-    Name=en*
+    Name=e*
 
     [Network]
     DHCP=ipv4
 
-Adjust the `Name=`, if necessary. In case the system doesn't have
-networkd enabled one can just enable it for initramfs (cf.
-[`add_dracutmodules`][addmod] and [`dracut --add
-systemd-networkd`][dradd]).  Alternatively, early boot network
-connectivity can be configured by other means (i.e.  kernel
-parameters, see below).  However, the author of this README
-strongly recommends to use Networkd instead of NetworkManager on
-servers and server-like systems.
+Adjust the `Name=`, if necessary.
 
-If the above example is sufficient you can copy the drop-in config
-file in `/etc/dracut.conf.d/`:
+Note that the dracut networkd module doesn't include the system's
+network configuration files by default and note that the module
+isn't enabled, by default, either. Thus, you have to configure
+Dracut for networkd (cf. the [install_items][iitems] and
+[add_dracutmodules][addmod] directives). Example:
+
+    # cat /etc/dracut.conf.d/90-networkd.conf
+    install_items+=" /etc/systemd/network/20-wired.network "
+    add_dracutmodules+=" systemd-networkd "
+
+Alternatively, early boot network connectivity can be configured
+by other means (i.e.  kernel parameters, see below).  However,
+the author of this README strongly recommends to use Networkd
+instead of NetworkManager on servers and server-like systems.
+
+If the above example is sufficient you just need to copy the
+example configuration files from the `example/` subdirectory:
 
     # cp example/20-wired.network  /etc/systemd/network
     # cp example/90-networkd.conf /etc/dracut.conf.d
@@ -326,7 +336,7 @@ volume. Main differences to dracut-sshd:
 - arguably more complex than dracut-sshd - certainly more lines
   of code and some options
 - comes with an unlock command that is superfluous in the
-  presence of `systemd-tty-ask-password-agent` - and it's kind of
+  presence of [`systemd-tty-ask-password-agent`][pwagent] - and it's kind of
   dangerous to use, e.g. when the password prompt times out the
   password is echoed to the console
 
@@ -369,7 +379,7 @@ Related ticket: [Bug 524727 - Dracut + encrypted root + networking (2009)][bug52
 
 ## Tested Environments
 
-- Fedora 27, 28, 29
+- Fedora 27 to 32
 - CentOS 7, 8
 - RHEL 8 beta 1
 - Gentoo (by a contributor)
@@ -399,12 +409,13 @@ Related ticket: [Bug 524727 - Dracut + encrypted root + networking (2009)][bug52
 [networkd]: https://wiki.archlinux.org/index.php/systemd-networkd
 [nm]: https://wiki.archlinux.org/index.php/NetworkManager
 [ossh]: https://en.wikipedia.org/wiki/OpenSSH
-[pwagent]: https://www.freedesktop.org/software/systemd/man/systemd-tty-ask-password-agent.html
+[pwagent]: https://manpath.be/f32/1/systemd-tty-ask-password-agent
 [systemd]: https://en.wikipedia.org/wiki/Systemd
 [switchroot]: https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt
 [tmpfs]: https://en.wikipedia.org/wiki/Tmpfs
 [tpm]: https://en.wikipedia.org/wiki/Trusted_Platform_Module
-[addmod]: https://manpath.be/f30/5/dracut.conf#L29
-[dradd]: https://manpath.be/f30/8/dracut#L94
+[addmod]: https://manpath.be/f32/dracut/050-26.git20200316.fc32.x86_64/5/dracut.conf#L74
 [port]: https://github.com/gsauthof/dracut-sshd/issues/9#issuecomment-531308602
 [entropy]: https://github.com/gsauthof/dracut-sshd/issues/12
+[iitems]: https://manpath.be/f32/dracut/050-26.git20200316.fc32.x86_64/5/dracut.conf#L74
+
