@@ -254,6 +254,11 @@ An alternative to the [networkd][networkd] configuration is to
 configure network via additional [Dracut command line
 parameters][dracut-cmdline].
 
+This requires the activation of the network dracut module, e.g.:
+
+    # cat /etc/dracut.conf.d/90-network.conf
+    add_dracutmodules+=" network "
+
 On systems without networkd (e.g. CentOS 7/RHEL 8) this is the only way
 to enable network connectivity in early userspace. For example,
 the following parameters enable DHCP on all network interfaces in
@@ -395,7 +400,7 @@ Related ticket: [Bug 524727 - Dracut + encrypted root + networking (2009)][bug52
 [cryptssh]: https://github.com/dracut-crypt-ssh/dracut-crypt-ssh
 [cryptssh-uwe]: https://github.com/dracut-crypt-ssh/dracut-crypt-ssh/pull/17
 [dracut]: https://dracut.wiki.kernel.org/index.php/Main_Page
-[dracut-cmdline]: http://man7.org/linux/man-pages/man7/dracut.cmdline.7.html
+[dracut-cmdline]: https://manpath.be/f32/7/dracut.cmdline
 [dropbear]: https://en.wikipedia.org/wiki/Dropbear_(software)
 [drop25519]: https://github.com/pts/pts-dropbear
 [ifcfg]: https://www.centos.org/docs/5/html/Deployment_Guide-en-US/s1-networkscripts-interfaces.html
