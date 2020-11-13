@@ -37,10 +37,15 @@ install() {
         return 1
     fi
 
-    if [ -e /root/.ssh/dracut_authorized_keys ]; then
-        authorized_keys=/root/.ssh/dracut_authorized_keys
-    else
-        authorized_keys=/root/.ssh/authorized_keys
+    if [ $(grep -q '^AUTHORIZED_KEYS=' /etc/sysconfig/dracut-sshd) ]; then
+        authorized_keys=`grep "^AUTHORIZED_KEYS=" /etc/sysconfig/dracut-sshd | sed -e "s/\(^AUTHORIZED_KEYS=\)\([^\#]*\)/\2/"`
+    fi
+    if [ ! -r "$authorized_keys" ]; then
+        if [ -e /root/.ssh/dracut_authorized_keys ]; then
+            authorized_keys=/root/.ssh/dracut_authorized_keys
+        else
+            authorized_keys=/root/.ssh/authorized_keys
+        fi
     fi
     if [ ! -r "$authorized_keys" ]; then
         dfatal "No authorized_keys for root user found!"
@@ -94,4 +99,3 @@ install() {
 
     return 0
 }
-

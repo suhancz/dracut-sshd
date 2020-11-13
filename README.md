@@ -84,13 +84,23 @@ has to adjust the systemd service file:
           -i \
           /usr/lib/dracut/modules.d/46sshd/sshd.service
 
-Make sure that `/root/.ssh/authorized_keys` contains the right
-keys, as it's included in the [initramfs][iramfs]:
+`/root/.ssh/authorized_keys` is the default `authorized_keys` file.
+
+A custom `AUTHORIZED_KEYS` value in `/etc/sysconfig/dracut-sshd` can
+point to your custom path for the keys. This might be needed for
+example when using an [rpm-ostree]-based distro and your root
+directory setup differs from the long-time standard.
+
+    AUTHORIZED_KEYS=/var/roothome/.ssh/authorized_keys
+
+Make sure that your `authorized_keys` file contains the right keys, as
+it's included in the [initramfs][iramfs]:
 
     # cat /root/.ssh/authorized_keys
 
 That said, if `/root/.ssh/dracut_authorized_keys` is present
-then it is included, instead.
+then it is included, it takes precedence over
+`/root/.ssh/authorized_keys`.
 
 Of course, our initramfs image needs network support. The simplest
 way to achieve this is to include [networkd][networkd]. To install
@@ -104,7 +114,7 @@ installed as dependency.
 Create a non-[NetworkManager][nm] network config, e.g. via
 [Networkd][networkd]:
 
-    $ cat /etc/systemd/network/20-wired.network 
+    $ cat /etc/systemd/network/20-wired.network
     [Match]
     Name=e*
 
@@ -437,3 +447,4 @@ Related ticket: [Bug 524727 - Dracut + encrypted root + networking (2009)][bug52
 [entropy]: https://github.com/gsauthof/dracut-sshd/issues/12
 [iitems]: https://manpath.be/f32/dracut/050-26.git20200316.fc32.x86_64/5/dracut.conf#L74
 [i30]: https://github.com/gsauthof/dracut-sshd/issues/30
+[rpm-ostree]: https://discussion.fedoraproject.org/t/using-dracut-sshd-to-unlock-a-luks-encrypted-system/23449/6
