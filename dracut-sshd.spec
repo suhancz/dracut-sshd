@@ -33,6 +33,8 @@ cp -r 46sshd %{buildroot}/usr/lib/dracut/modules.d/
 %files
 /usr/lib/dracut/modules.d/46sshd/module-setup.sh
 /usr/lib/dracut/modules.d/46sshd/sshd.service
+/usr/lib/dracut/modules.d/46sshd/motd
+/usr/lib/dracut/modules.d/46sshd/profile
 %config(noreplace) /usr/lib/dracut/modules.d/46sshd/sshd_config
 %doc README.md
 %doc example/20-wired.network
