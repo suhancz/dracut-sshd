@@ -84,15 +84,12 @@ has to adjust the systemd service file:
           -i \
           /usr/lib/dracut/modules.d/46sshd/sshd.service
 
-`/root/.ssh/authorized_keys` is the default `authorized_keys` file.
+`/root/.ssh/dracut_authorized_keys` is the default `authorized_keys` file.
 
-A custom `AUTHORIZED_KEYS` value in `/etc/sysconfig/dracut-sshd` can
-point to your custom path for the keys. This might be needed for
-example when using an [rpm-ostree]-based distro and your root
-directory setup differs from the long-time standard.
-
-    AUTHORIZED_KEYS=/var/roothome/.ssh/authorized_keys
-
+A custom located authorized_keys file can be deployed as
+`/etc/dracut-sshd/authorized_keys`. This might be needed for example
+when using an [rpm-ostree]-based distro and your root directory setup
+differs from the long-time standard.
 Make sure that your `authorized_keys` file contains the right keys, as
 it's included in the [initramfs][iramfs]:
 
@@ -100,6 +97,7 @@ it's included in the [initramfs][iramfs]:
 
 That said, if `/root/.ssh/dracut_authorized_keys` is present
 then it is included, it takes precedence over
+`/etc/dracut-sshd/authorized_keys`, which takes precedence over
 `/root/.ssh/authorized_keys`.
 
 Of course, our initramfs image needs network support. The simplest

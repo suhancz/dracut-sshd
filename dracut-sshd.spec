@@ -39,8 +39,8 @@ cp -r 46sshd %{buildroot}/usr/lib/dracut/modules.d/
 %doc example/90-networkd.conf
 
 %changelog
-* Fri Nov 13 2020 Akos Balla <akos.balla@sirc.hu> - 0.6.2-2
-- make path to authorized_keys customizable
+* Thu Nov 19 2020 Akos Balla <akos.balla@sirc.hu> - 0.6.2-2
+- add /etc/dracut-sshd/authorized_keys as an option
 
 * Sat Oct 31 2020 Georg Sauthoff <mail@gms.tf> - 0.6.2-1
 - check whether key is included
