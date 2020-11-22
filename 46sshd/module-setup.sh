@@ -64,8 +64,8 @@ install() {
     inst_simple "${moddir}/sshd.service" "$systemdsystemunitdir/sshd.service"
     inst_simple "${moddir}/sshd_config" /etc/ssh/sshd_config
 
-    grep '^sshd:' /etc/passwd >> "$initdir/etc/passwd"
-    grep '^sshd:' /etc/group  >> "$initdir/etc/group"
+    (grep '^sshd:' /etc/passwd || getent passwd '^sshd:') >> "$initdir/etc/passwd"
+    (grep '^sshd:' /etc/group || getent group '^sshd:' ) >> "$initdir/etc/group"
 
     # Create privilege seperation directory
     # /var/empty/sshd  -> Fedora, CentOS, RHEL
@@ -80,6 +80,10 @@ install() {
             break
         fi
     done
+    # workaround for Silverblue mount points https://github.com/coreos/rpm-ostree/issues/2325
+    if [ "$VARIANT" == "Silverblue" ];then
+      mkdir -p -m 0755 "$initdir/var/empty/sshd"
+    fi
 
     systemctl -q --root "$initdir" enable sshd
 
