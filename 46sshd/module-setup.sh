@@ -43,8 +43,6 @@ install() {
         authorized_keys=/etc/dracut-sshd/authorized_keys
     else
         authorized_keys=/root/.ssh/authorized_keys
-    elif [ -e /etc/dracut-sshd/authorized_keys ]; then
-        authorized_keys=/etc/dracut-sshd/authorized_keys
     fi
     if [ ! -r "$authorized_keys" ]; then
         dfatal "No authorized_keys for root user found!"
