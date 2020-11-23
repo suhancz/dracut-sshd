@@ -81,7 +81,7 @@ install() {
         fi
     done
     # workaround for Silverblue mount points https://github.com/coreos/rpm-ostree/issues/2325
-    if [ "$VARIANT" == "Silverblue" ];then
+    if [ `grep "^VARIANT_ID=" /etc/os-release | sed -e "s/\(^VARIANT_ID=\)\([^\#]*\)/\2/"` == "silverblue" ];then
       mkdir -p -m 0755 "$initdir/var/empty/sshd"
     fi
 
