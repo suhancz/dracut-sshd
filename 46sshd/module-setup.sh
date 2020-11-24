@@ -64,8 +64,8 @@ install() {
     inst_simple "${moddir}/sshd.service" "$systemdsystemunitdir/sshd.service"
     inst_simple "${moddir}/sshd_config" /etc/ssh/sshd_config
 
-    (grep '^sshd:' /etc/passwd || getent passwd '^sshd:') >> "$initdir/etc/passwd"
-    (grep '^sshd:' /etc/group || getent group '^sshd:' ) >> "$initdir/etc/group"
+    (grep '^sshd:' /etc/passwd || getent passwd '^sshd:' || echo 'sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin' ) >> "$initdir/etc/passwd"
+    (grep '^sshd:' /etc/group || getent group '^sshd:' || echo 'sshd:x:74:' ) >> "$initdir/etc/group"
 
     # Create privilege seperation directory
     # /var/empty/sshd  -> Fedora, CentOS, RHEL
