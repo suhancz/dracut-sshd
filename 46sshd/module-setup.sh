@@ -64,10 +64,10 @@ install() {
     inst_simple "${moddir}/sshd.service" "$systemdsystemunitdir/sshd.service"
     inst_simple "${moddir}/sshd_config" /etc/ssh/sshd_config
 
-    (grep '^sshd:' /etc/passwd || getent passwd sshd || echo 'sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin' ) >> "$initdir/etc/passwd"
-    (grep '^sshd:' /etc/group || getent group sshd || echo 'sshd:x:74:' ) >> "$initdir/etc/group"
+    (grep '^sshd:' $dracutsysrootdir/etc/passwd || getent passwd sshd || echo 'sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin' ) >> "$initdir/etc/passwd"
+    (grep '^sshd:' $dracutsysrootdir/etc/group || getent group sshd || echo 'sshd:x:74:' ) >> "$initdir/etc/group"
 
-    # Create privilege seperation directory
+    # Create privilege separation directory
     # /var/empty/sshd  -> Fedora, CentOS, RHEL
     # /var/emtpy       -> Arch, OpenSSH upstream
     # /var/lib/empty   -> Suse
@@ -81,8 +81,8 @@ install() {
         fi
     done
     # workaround for Silverblue mount points https://github.com/coreos/rpm-ostree/issues/2325
-    if grep ^VARIANT_ID=silverblue$ /etc/os-release > /dev/null ;then
-      mkdir -p -m 0755 "$initdir/var/empty/sshd"
+    if grep ^VARIANT_ID=silverblue$ /etc/os-release > /dev/null; then
+        mkdir -p -m 0755 "$initdir/var/empty/sshd"
     fi
 
     systemctl -q --root "$initdir" enable sshd
